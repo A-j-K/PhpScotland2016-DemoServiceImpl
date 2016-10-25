@@ -14,16 +14,10 @@ class DemoServiceRmq implements DemoServiceInterface
 	public function handleRequest(DemoServiceRequest $request) {
 		$logs = array();
 		try {
-			$session_id = $request->getParam("sessionid", null);
+			$session_id = $request->getParam("session_id", null);
 			if(is_null($session_id)) {
 				throw new \Exception("No sessionid provided");
 			}
-			$times = $request->getParam("times", 1);
-			$wait_for = $request->getParam("wait_for", 1);
-			$req = new DemoServiceRequest;
-			$req->setParam("route", "rmq");
-			$req->setParam("wait_for", $wait);
-			$req->setParam("session_id", $session_id);
 			$rmq_ready = false;
 			// While loop to ensure RabbitMQ demo docker has started.
 			while(!$rmq_ready) {
@@ -47,16 +41,14 @@ class DemoServiceRmq implements DemoServiceInterface
 					false, // exclusive
 					true   // auto_delete
 			);
-			while($times > 0) {
-				$msg = new AMQPMessage($req->get());
-				$chan->basic_publish($msg, "", $_ENV["RMQ_QUEUE"]);
-				$times--;
-				$counter++;
-			}
+			$msg = new AMQPMessage($request->get());
+			$chan->basic_publish($msg, "", $_ENV["RMQ_QUEUE"]);
 			$chan->close();
 			$conn->close();
 		}
-		catch(\Exception $e) {}
+		catch(\Exception $e) {
+			error_log("Exception: ". $e->getMessage());
+		}
 		
 		$message = $request->getAsArray();
 		$message['result'] = 0;
