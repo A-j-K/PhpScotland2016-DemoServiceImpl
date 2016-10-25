@@ -11,15 +11,15 @@ class DemoServiceZmq implements DemoServiceInterface
 	public function handleRequest(DemoServiceRequest $request) {
 		$context = new \ZMQContext();
 		try {
-			$session_id = isset($_GET['sessionid']) ? (int)$_GET['sessionid'] : null;
+			$session_id = $request->getParam("sessionid", null);
 			if(is_null($session_id)) {
 				throw new \Exception("No sessionid provided");
 			}
+			$times = $request->getParam("times", 1);
+			$wait_for = $request->getParam("wait_for", 1);
 			$conn = "tcp://".$_ENV["ZMQ_BROKER"].":" . $_ENV["ZMQ_BROKER_FRONT_PORT"];
 			$zmq = $context->getSocket(\ZMQ::SOCKET_REQ, null);
 			$zmq->connect($conn);
-			$wait = isset($_GET['wait']) ? (int)$_GET['wait'] : 1;
-			$times = isset($_GET['times']) ? (int)$_GET['times'] : 1;
 			while($times > 0) {
 				$req = new DemoServiceRequest;
 				$req->setParam("route", "zmq");

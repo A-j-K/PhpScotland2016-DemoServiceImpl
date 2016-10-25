@@ -14,12 +14,12 @@ class DemoServiceRmq implements DemoServiceInterface
 	public function handleRequest(DemoServiceRequest $request) {
 		$logs = array();
 		try {
-			$session_id = isset($_GET['sessionid']) ? (int)$_GET['sessionid'] : null;
+			$session_id = $request->getParam("sessionid", null);
 			if(is_null($session_id)) {
 				throw new \Exception("No sessionid provided");
 			}
-			$wait = isset($_GET['wait']) ? (int)$_GET['wait'] : 1;
-			$times = isset($_GET['times']) ? (int)$_GET['times'] : 1;
+			$times = $request->getParam("times", 1);
+			$wait_for = $request->getParam("wait_for", 1);
 			$req = new DemoServiceRequest;
 			$req->setParam("route", "rmq");
 			$req->setParam("wait_for", $wait);
@@ -56,8 +56,7 @@ class DemoServiceRmq implements DemoServiceInterface
 			$chan->close();
 			$conn->close();
 		}
-		catch(\Exception $e) {
-		}
+		catch(\Exception $e) {}
 		
 		$message = $request->getAsArray();
 		$message['result'] = 0;
