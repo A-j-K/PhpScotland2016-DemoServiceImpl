@@ -6,7 +6,7 @@ use PhpScotland2016\Demo\Service\Interfaces\DemoServiceRequest;
 use PhpScotland2016\Demo\Service\Interfaces\DemoServiceResponse;
 use PhpScotland2016\Demo\Service\Interfaces\DemoServiceInterface;
 
-class DemoServiceLocal implements DemoServiceInterface
+class DemoServiceZmq implements DemoServiceInterface
 {
 	public function handleRequest(DemoServiceRequest $request) {
 		$context = new \ZMQContext();
